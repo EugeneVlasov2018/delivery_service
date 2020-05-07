@@ -7,9 +7,8 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class Courier {
 	private Long id;
-	private String personalCode;
 	private String firstName;
 	private String lastName;
 	private String phone;
-	private Boolean courierIsFree;
+	private Boolean isOnRoute;
 }

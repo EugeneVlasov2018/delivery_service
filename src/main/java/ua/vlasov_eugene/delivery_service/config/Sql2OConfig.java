@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.sql2o.Sql2o;
 
 import javax.sql.DataSource;
+
 @Configuration
 public class Sql2OConfig {
 	@Value("${datasource}")

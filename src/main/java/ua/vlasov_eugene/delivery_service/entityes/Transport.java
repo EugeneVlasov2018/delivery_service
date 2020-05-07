@@ -8,7 +8,6 @@ import lombok.experimental.Accessors;
 public class Transport {
 	private Long id;
 	private String numberOfVencile;
-	private VencileCrew crew;
-	private Boolean transportIsFree;
-
+	private VehicleCrew crew;
+	private Route route;
 }

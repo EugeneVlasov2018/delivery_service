@@ -26,7 +26,7 @@ public class RouteController {
 									@ApiParam(value = "Параметр для отбора маршрута по клиенту.\n" +
 											"В случае отсутствия будут переданы маршруты по всем клиентам")
 									@PathVariable(required = false) String clientId,
-									@RequestParam(defaultValue = "0") Long numberOfPage,
+									@RequestParam(defaultValue = "1") Long numberOfPage,
 									@RequestParam(defaultValue = "10") Long elementsInPage){
 		return routeService.getAllRoutes(routeStatus, clientId,numberOfPage,elementsInPage);
 	}

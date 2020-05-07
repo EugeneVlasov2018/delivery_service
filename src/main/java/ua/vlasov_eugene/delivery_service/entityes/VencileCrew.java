@@ -9,5 +9,6 @@ import java.util.List;
 @Accessors(chain = true)
 public class VencileCrew {
 	private Long id;
+	private String code;
 	private List<Courier> couriers;
 }

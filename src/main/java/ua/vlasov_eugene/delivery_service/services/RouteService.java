@@ -6,12 +6,13 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.vlasov_eugene.delivery_service.dtos.OldAndNewRouteDto;
 import ua.vlasov_eugene.delivery_service.entityes.Route;
 import ua.vlasov_eugene.delivery_service.enums.RouteStatus;
+import ua.vlasov_eugene.delivery_service.repositories.RouteRepository;
 import ua.vlasov_eugene.delivery_service.utils.Page;
 
 @Service
 @RequiredArgsConstructor
 public class RouteService {
-
+	private final RouteRepository RouteRepo;
 
 	@Transactional
 	public OldAndNewRouteDto updateRouteById(Route route) {

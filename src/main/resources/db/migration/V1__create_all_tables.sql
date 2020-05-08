@@ -43,9 +43,6 @@ create table if not exists vehiclecrew_courier
 
 alter table vehiclecrew_courier owner to postgres;
 
-create unique index if not exists vehiclecrew_courier_courier_id_uindex
-	on vehiclecrew_courier (courier_id);
-
 create table if not exists transport
 (
 	id serial not null

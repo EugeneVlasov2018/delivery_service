@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.vlasov_eugene.delivery_service.dtos.OldAndNewRouteDto;
-import ua.vlasov_eugene.delivery_service.entityes.Route;
+import ua.vlasov_eugene.delivery_service.entities.Route;
 import ua.vlasov_eugene.delivery_service.enums.RouteStatus;
 import ua.vlasov_eugene.delivery_service.exceptions.WrongStatusException;
+import ua.vlasov_eugene.delivery_service.dtos.RouteDto;
+import ua.vlasov_eugene.delivery_service.mappers.RouteMapper;
 import ua.vlasov_eugene.delivery_service.repositories.RouteRepository;
 import ua.vlasov_eugene.delivery_service.utils.Page;
 
@@ -23,9 +25,10 @@ public class RouteService {
 			"Статус данного маршрута не позволяет вам начать поездку";
 	private static final String ROUTE_IS_NOT_IN_PROGRESS = "Вы не можете закрыть поездку, которая еще не началась";
 	private final RouteRepository routeRepo;
+	private final RouteMapper routeMapper;
 
 	@Transactional
-	public OldAndNewRouteDto updateRouteById(Route newVersion) {
+	public OldAndNewRouteDto updateRouteById(RouteDto newVersion) {
 		Route oldVersion = getRouteById(newVersion.getId());
 
 		if(routeStatusIsWrong(newVersion,RouteStatus.FUTURE_ROUTE)){
@@ -39,12 +42,12 @@ public class RouteService {
 
 
 	@Transactional
-	public Page<Route> getAllRoutes(RouteStatus routeStatus, String clientId, Long numberOfPage, Long elementsInPage) {
+	public Page<RouteDto> getAllRoutes(RouteStatus routeStatus, String clientId, Long numberOfPage, Long elementsInPage) {
 		return routeRepo.getRoutesByFilter(routeStatus,clientId,numberOfPage,elementsInPage);
 	}
 
 	@Transactional
-	public Route createNewRoute(Route params) {
+	public RouteDto createNewRoute(RouteDto params) {
 		return routeRepo.createNewRoute(params);
 	}
 
@@ -58,12 +61,18 @@ public class RouteService {
 	}
 
 	@Transactional
-	public Route getRouteById(Long routeId) {
+	public RouteDto getRouteById(Long routeId){
+		return routeMapper.RouteToRouteDto(serviceRouteById(routeId));
+	}
+
+
+	private Route serviceRouteById(Long routeId) {
 		return routeRepo.getRouteById(routeId);
 	}
 
+
 	@Transactional
-	public Route startRoute(Long id) {
+	public RouteDto startRoute(Long id) {
 		Route currentRoute = routeRepo.getRouteById(id);
 		if(routeStatusIsWrong(currentRoute,RouteStatus.FUTURE_ROUTE)){
 			throw new WrongStatusException(ROUTE_IS_IN_PROGRESS_OR_FINISHED);
@@ -72,7 +81,7 @@ public class RouteService {
 	}
 
 	@Transactional
-	public Route finishRoute(Long id) {
+	public RouteDto finishRoute(Long id) {
 		Route currentRoute = routeRepo.getRouteById(id);
 		if(routeStatusIsWrong(currentRoute,RouteStatus.ROUTE_IN_PROCESS)){
 			throw new WrongStatusException(ROUTE_IS_NOT_IN_PROGRESS);

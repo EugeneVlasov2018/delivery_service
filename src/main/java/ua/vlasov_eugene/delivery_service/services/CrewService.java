@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.vlasov_eugene.delivery_service.dtos.OldAndNewVersionCrewDto;
-import ua.vlasov_eugene.delivery_service.entityes.Courier;
-import ua.vlasov_eugene.delivery_service.entityes.VehicleCrew;
+import ua.vlasov_eugene.delivery_service.dtos.CourierDto;
+import ua.vlasov_eugene.delivery_service.dtos.CrewDto;
 import ua.vlasov_eugene.delivery_service.enums.RouteStatus;
 import ua.vlasov_eugene.delivery_service.exceptions.WrongCourierException;
 import ua.vlasov_eugene.delivery_service.exceptions.WrongStatusException;
@@ -28,7 +28,7 @@ public class CrewService {
 	private final CourierRepository courierRepo;
 
 	@Transactional
-	public Page<VehicleCrew> getCrewByFilter(RouteStatus routeStatus, Long numberOfPage, Long elementsInPage) {
+	public Page<CrewDto> getCrewByFilter(RouteStatus routeStatus, Long numberOfPage, Long elementsInPage) {
 		if(routeStatus==null){
 			return crewRepo.getAllCrews(numberOfPage,elementsInPage);
 		}
@@ -36,13 +36,13 @@ public class CrewService {
 	}
 
 	@Transactional
-	public VehicleCrew getCrewById(Long id) {
+	public CrewDto getCrewById(Long id) {
 		return crewRepo.getCrewById(id);
 	}
 
 	@Transactional
-	public OldAndNewVersionCrewDto updateCrew(VehicleCrew newVersionOfCrew) {
-		VehicleCrew oldVersion = crewRepo.getCrewById(newVersionOfCrew.getId());
+	public OldAndNewVersionCrewDto updateCrew(CrewDto newVersionOfCrew) {
+		CrewDto oldVersion = crewRepo.getCrewById(newVersionOfCrew.getId());
 
 		checkRouteStatus(oldVersion);
 		checkCouriersStatus(newVersionOfCrew);
@@ -54,7 +54,7 @@ public class CrewService {
 
 	@Transactional
 	public String deleteById(Long id) {
-		VehicleCrew currentCrew = crewRepo.getCrewById(id);
+		CrewDto currentCrew = crewRepo.getCrewById(id);
 		checkRouteStatus(currentCrew);
 		//toDo прописать работу с другими сущностями
 		crewRepo.deleteCrewById(id);
@@ -62,28 +62,28 @@ public class CrewService {
 	}
 
 	@Transactional
-	public VehicleCrew createNewCrew(List<String> couriersCode) {
-		List<Courier> couriersForCrew = couriersCode.stream()
+	public CrewDto createNewCrew(List<String> couriersCode) {
+		List<CourierDto> couriersForCrew = couriersCode.stream()
 				.filter(code -> !code.isEmpty())
 				.map(courierRepo::getCourierByCode)
 				.collect(Collectors.toList());
 
-		VehicleCrew result = new VehicleCrew()
+		CrewDto result = new CrewDto()
 				.setCode(dataCreator.getUUID())
 				.setCouriers(couriersForCrew);
 
 		return crewRepo.createNewCrew(result);
 	}
 
-	private void checkCouriersStatus(VehicleCrew newVersionOfCrew) {
+	private void checkCouriersStatus(CrewDto newVersionOfCrew) {
 		if(newVersionOfCrew.getCouriers()
 				.stream()
-				.anyMatch(Courier::getIsOnRoute)){
+				.anyMatch(CourierDto::getIsOnRoute)){
 			throw new WrongCourierException(WRONG_COURIER);
 		}
 	}
 
-	private void checkRouteStatus(VehicleCrew oldVersion) {
+	private void checkRouteStatus(CrewDto oldVersion) {
 		if(oldVersion.getTransport().getRoute().getStatus() == RouteStatus.ROUTE_IN_PROCESS){
 			throw new WrongStatusException(WRONG_STATUS_OF_CREW);
 		}

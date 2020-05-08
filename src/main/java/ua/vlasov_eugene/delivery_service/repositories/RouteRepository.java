@@ -1,7 +1,7 @@
 package ua.vlasov_eugene.delivery_service.repositories;
 
 import org.springframework.stereotype.Repository;
-import ua.vlasov_eugene.delivery_service.entityes.Route;
+import ua.vlasov_eugene.delivery_service.entities.Route;
 import ua.vlasov_eugene.delivery_service.enums.RouteStatus;
 import ua.vlasov_eugene.delivery_service.utils.Page;
 

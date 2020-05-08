@@ -1,27 +1,27 @@
 package ua.vlasov_eugene.delivery_service.repositories;
 
 import org.springframework.stereotype.Repository;
-import ua.vlasov_eugene.delivery_service.entityes.VehicleCrew;
+import ua.vlasov_eugene.delivery_service.dtos.CrewDto;
 import ua.vlasov_eugene.delivery_service.enums.RouteStatus;
 import ua.vlasov_eugene.delivery_service.utils.Page;
 
 @Repository
 public class CrewRepository {
-	public Page<VehicleCrew> getAllCrews(Long numberOfPage, Long elementsInPage) {
+	public Page<CrewDto> getAllCrews(Long numberOfPage, Long elementsInPage) {
 		return null;
 	}
 
-	public Page<VehicleCrew> getAllCrewsWithCurrentStatus(RouteStatus routeStatus,
-														  Long numberOfPage,
-														  Long elementsInPage) {
+	public Page<CrewDto> getAllCrewsWithCurrentStatus(RouteStatus routeStatus,
+													  Long numberOfPage,
+													  Long elementsInPage) {
 		return null;
 	}
 
-	public VehicleCrew getCrewById(Long id) {
+	public CrewDto getCrewById(Long id) {
 		return null;
 	}
 
-	public VehicleCrew updateCrew(VehicleCrew oldVersionOfCrew) {
+	public CrewDto updateCrew(CrewDto oldVersionOfCrew) {
 		return null;
 	}
 
@@ -29,7 +29,7 @@ public class CrewRepository {
 
 	}
 
-	public VehicleCrew createNewCrew(VehicleCrew result) {
+	public CrewDto createNewCrew(CrewDto result) {
 		return null;
 	}
 }

@@ -10,17 +10,6 @@ create table if not exists client
 
 alter table client owner to postgres;
 
-create table if not exists courier
-(
-	id serial not null
-		constraint courier_pk
-			primary key,
-	firstname_lastname varchar(50),
-	phone_number varchar(50) not null
-);
-
-alter table courier owner to postgres;
-
 create table if not exists vehicle_crew
 (
 	id serial not null
@@ -31,17 +20,19 @@ create table if not exists vehicle_crew
 
 alter table vehicle_crew owner to postgres;
 
-create table if not exists vehiclecrew_courier
+create table if not exists courier
 (
-	crew_id integer not null
-		constraint vehiclecrew_courier_vehicle_crew_id_fk
-			references vehicle_crew,
-	courier_id integer not null
-		constraint vehiclecrew_courier_courier_id_fk
-			references courier
+	id serial not null
+		constraint courier_pk
+			primary key,
+	firstname_lastname varchar(50),
+	phone_number varchar(50) not null,
+	crew_id integer
+		constraint courier_vehicle_crew_id_fk
+			references vehicle_crew
 );
 
-alter table vehiclecrew_courier owner to postgres;
+alter table courier owner to postgres;
 
 create table if not exists transport
 (

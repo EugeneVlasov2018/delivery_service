@@ -9,4 +9,5 @@ public class Courier {
 	private Long id;
 	private String firstNameLastName;
 	private String phoneNumber;
+	private Long crewId;
 }

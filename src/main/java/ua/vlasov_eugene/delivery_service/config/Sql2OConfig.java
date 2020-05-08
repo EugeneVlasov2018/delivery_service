@@ -11,13 +11,19 @@ import javax.sql.DataSource;
 
 @Configuration
 public class Sql2OConfig {
-	@Value("${datasource}")
-	private String jdbcUrl;
+	@Value("${dbUser}")
+	private String username;
+	@Value("${dbPassword}")
+	private String password;
+	@Value("${dbUrl}")
+	private String dbUrl;
 
 	@Bean
 	public DataSource dataSource() {
 		HikariConfig config = new HikariConfig();
-		config.setJdbcUrl(jdbcUrl);
+		config.setUsername(username);
+		config.setPassword(password);
+		config.setJdbcUrl(dbUrl);
 		config.setDriverClassName("org.postgresql.Driver");
 		config.setMinimumIdle(10);
 		config.setMaximumPoolSize(100);

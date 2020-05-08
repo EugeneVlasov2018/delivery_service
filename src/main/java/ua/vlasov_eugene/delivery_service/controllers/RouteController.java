@@ -5,12 +5,10 @@ import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ua.vlasov_eugene.delivery_service.dtos.OldAndNewRouteDto;
-import ua.vlasov_eugene.delivery_service.entityes.Route;
 import ua.vlasov_eugene.delivery_service.enums.RouteStatus;
+import ua.vlasov_eugene.delivery_service.dtos.RouteDto;
 import ua.vlasov_eugene.delivery_service.services.RouteService;
 import ua.vlasov_eugene.delivery_service.utils.Page;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,33 +18,33 @@ public class RouteController {
 
 	@ApiOperation("Возвращает все маршруты согласно входящих параметров.")
 	@GetMapping("/{routeStatus}/{clientId}")
-	public Page<Route> getAllRoutes(@ApiParam(value = "Параметр для отбора маршрутов по типу.\n" +
+	public Page<RouteDto> getAllRoutes(@ApiParam(value = "Параметр для отбора маршрутов по типу.\n" +
 			"В случае отсутствия параметра в запросе будут получены все маршруты")
 									@PathVariable(required = false) RouteStatus routeStatus,
-									@ApiParam(value = "Параметр для отбора маршрута по клиенту.\n" +
+									   @ApiParam(value = "Параметр для отбора маршрута по клиенту.\n" +
 											"В случае отсутствия будут переданы маршруты по всем клиентам")
 									@PathVariable(required = false) String clientId,
-									@RequestParam(defaultValue = "1") Long numberOfPage,
-									@RequestParam(defaultValue = "10") Long elementsInPage){
+									   @RequestParam(defaultValue = "1") Long numberOfPage,
+									   @RequestParam(defaultValue = "10") Long elementsInPage){
 		return routeService.getAllRoutes(routeStatus, clientId,numberOfPage,elementsInPage);
 	}
 
 	@ApiOperation("Возвращает определенный маршрут по id.")
 	@GetMapping("/{routeId}")
-	public Route getRouteById(@PathVariable Long routeId){
+	public RouteDto getRouteById(@PathVariable Long routeId){
 		return routeService.getRouteById(routeId);
 	}
 
 	@ApiOperation("Эндпоинт для создания нового маршрута")
 	@PostMapping
-	public Route createNewRoute(@RequestBody Route params){
+	public RouteDto createNewRoute(@RequestBody RouteDto params){
 		return routeService.createNewRoute(params);
 	}
 
 	@ApiOperation("Эндпоинт для изменения маршрута.\n" +
 			"Если статус маршрута любой, кроме FUTURE_ROUTE, будет выброшено исключение")
 	@PutMapping
-	public OldAndNewRouteDto updateRouteById(@RequestBody Route route){
+	public OldAndNewRouteDto updateRouteById(@RequestBody RouteDto route){
 		return routeService.updateRouteById(route);
 	}
 
@@ -59,13 +57,13 @@ public class RouteController {
 
 	@ApiOperation("Эндпоинт для запуска маршрута по id")
 	@PutMapping("/start/{id}")
-	public Route startRoute(@PathVariable Long id){
+	public RouteDto startRoute(@PathVariable Long id){
 		return routeService.startRoute(id);
 	}
 
 	@ApiOperation("Эндпоинт для завершения маршрута по id")
 	@PutMapping("/finish/{id}")
-	public Route finishRoute(@PathVariable Long id){
+	public RouteDto finishRoute(@PathVariable Long id){
 		return routeService.finishRoute(id);
 	}
 }

@@ -1,4 +1,4 @@
-package ua.vlasov_eugene.delivery_service.entityes;
+package ua.vlasov_eugene.delivery_service.dtos;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -9,11 +9,11 @@ import java.util.List;
 
 @Data
 @Accessors(chain = true)
-public class Route {
+public class RouteDto {
 	private Long id;
-	private Client routeClient;
+	private LocalDateTime start;
+	private LocalDateTime end;
+	private List<ClientDto> routeClientDto;
 	private RouteStatus status;
-	private List<City> routePoints;
-	private LocalDateTime startRoute;
-	private LocalDateTime endRoute;
+	private TransportDto transportDto;
 }

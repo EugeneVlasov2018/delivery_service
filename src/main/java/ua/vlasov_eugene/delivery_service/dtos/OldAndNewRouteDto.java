@@ -2,7 +2,7 @@ package ua.vlasov_eugene.delivery_service.dtos;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import ua.vlasov_eugene.delivery_service.entityes.Route;
+import ua.vlasov_eugene.delivery_service.dtos.Route;
 
 @Data
 @Accessors(chain = true)

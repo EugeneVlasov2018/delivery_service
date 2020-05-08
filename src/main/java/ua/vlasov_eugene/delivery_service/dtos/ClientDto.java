@@ -5,7 +5,9 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class OldAndNewVersionCrewDto {
-	private CrewDto oldVersion;
-	private CrewDto newVersion;
+public class ClientDto {
+	private Long id;
+	private String name;
+	private String address;
+	private String phoneNumber;
 }

@@ -7,6 +7,8 @@ import ua.vlasov_eugene.delivery_service.entities.Route;
 import ua.vlasov_eugene.delivery_service.enums.RouteStatus;
 
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
@@ -46,15 +48,17 @@ public class RouteRepository {
 	}
 
 	public void startOrStopRoute(Connection connection, Route route) {
-		if(route.getFinish()==null){
+		if(route.getFinish()!=null){
 			connection.createQuery(STOP_ROUTE)
-					.addParameter("finish",route.getFinish())
+					.addParameter("finish",
+							LocalDateTime.ofInstant(route.getFinish().toInstant(), ZoneId.systemDefault()))
 					.addParameter("status",route.getStatus().name())
 					.addParameter("routeId",route.getId())
 					.executeUpdate();
 		} else {
 			connection.createQuery(START_ROUTE)
-					.addParameter("start",route.getStart())
+					.addParameter("start",
+							LocalDateTime.ofInstant(route.getStart().toInstant(),ZoneId.systemDefault()))
 					.addParameter("status",route.getStatus().name())
 					.addParameter("routeId",route.getId())
 					.executeUpdate();

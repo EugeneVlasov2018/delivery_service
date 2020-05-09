@@ -1,11 +1,9 @@
 package ua.vlasov_eugene.delivery_service.controllers;
 
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ua.vlasov_eugene.delivery_service.dtos.RouteDto;
-import ua.vlasov_eugene.delivery_service.entities.Route;
 import ua.vlasov_eugene.delivery_service.services.RouteService;
 import ua.vlasov_eugene.delivery_service.utils.Page;
 
@@ -17,9 +15,7 @@ import java.util.List;
 public class RouteController {
 	private final RouteService routeService;
 
-	@ApiOperation("Возвращает все маршруты согласно входящих параметров.\n" +
-			"ВАЖНО!!! Даты на сервере хранятся в таймзоне сервера, но возвращаются в UTC,\n" +
-			"чтобі на фронте біло удобнее подгонять ответ под таймзону клиента")
+	@ApiOperation("Возвращает все маршруты согласно входящих параметров.")
 	@GetMapping
 	public Page<RouteDto> getAllRoutes(@RequestParam(defaultValue = "1") Long numberOfPage,
 									   @RequestParam(defaultValue = "10") Long elementsInPage){

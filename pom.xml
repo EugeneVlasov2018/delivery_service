@@ -18,9 +18,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.9</java.version>
-        <flyway.user>Впиши юзера</flyway.user>
-        <flyway.url>Впиши урлу</flyway.url>
-        <flyway.password>Впиши пароль</flyway.password>
+        <flyway.user>postgres</flyway.user>
+        <flyway.url>jdbc:postgresql://localhost:5432/delivery_service</flyway.url>
+        <flyway.password>granit1506</flyway.password>
     </properties>
 
     <dependencies>

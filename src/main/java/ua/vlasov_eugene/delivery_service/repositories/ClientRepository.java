@@ -13,6 +13,7 @@ public class ClientRepository {
 	private static final String GET_CLIENTS_BY_ROUTE_ID = "SELECT c.* FROM client c " +
 			"JOIN route_client rc ON c.id = rc.client_id " +
 			"WHERE rc.route_id = :routeId";
+	private static final String GET_CLIENT_BY_ID = "SELECT * FROM client WHERE id = :id";
 	private ResultSetHandler<Client> resultSetHandler = rs -> {
 		Client item = new Client();
 		item.setId(rs.getLong("id"));
@@ -27,5 +28,11 @@ public class ClientRepository {
 		return connection.createQuery(GET_CLIENTS_BY_ROUTE_ID)
 				.addParameter("routeId",id)
 				.executeAndFetch(resultSetHandler);
+	}
+
+	public Client getClientsById(Connection connection, Long id) {
+		return connection.createQuery(GET_CLIENT_BY_ID)
+				.addParameter("id",id)
+				.executeAndFetchFirst(resultSetHandler);
 	}
 }

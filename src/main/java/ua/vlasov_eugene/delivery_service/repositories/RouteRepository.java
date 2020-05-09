@@ -5,7 +5,7 @@ import org.sql2o.Connection;
 import org.sql2o.ResultSetHandler;
 import ua.vlasov_eugene.delivery_service.entities.Route;
 import ua.vlasov_eugene.delivery_service.enums.RouteStatus;
-import ua.vlasov_eugene.delivery_service.utils.Page;
+
 
 import java.util.Calendar;
 import java.util.List;
@@ -21,6 +21,11 @@ public class RouteRepository {
 	private static final String START_ROUTE = "UPDATE route " +
 			"SET start_route = :start , route_status = :status " +
 			"WHERE id=:routeId";;
+	private static final String ADD_NEW_ROUTE = "INSERT INTO route " +
+			"(transport_id , route_status) " +
+			"VALUES (:transportId , :routeStatus)";
+	private static final String CONNECT_ROUTE_AND_CLIENT = "INSERT INTO route_client " +
+			"VALUES (:routeId , :clientId)";
 
 	private ResultSetHandler<Route> resultSetHandler = rs -> {
 		Calendar tzUtc = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
@@ -28,9 +33,9 @@ public class RouteRepository {
 		Route item = new Route();
 		item.setId(rs.getLong("id"));
 		item.setTransportId(rs.getLong("transport_id"));
-		item.setStart(rs.getTimestamp("start_route",tzUtc)));
+		item.setStart(rs.getTimestamp("start_route",tzUtc));
 		item.setFinish(rs.getTimestamp("end_route",tzUtc));
-		item.setStatus(RouteStatus.valueOf(rs.getString("route_status"))))
+		item.setStatus(RouteStatus.valueOf(rs.getString("route_status")));
 		return item;
 	};
 
@@ -54,27 +59,6 @@ public class RouteRepository {
 					.addParameter("routeId",route.getId())
 					.executeUpdate();
 		}
-		
-	}
-
-	public Page<Route> getRoutesByFilter(Long clientId, Long numberOfPage, Long elementsInPage) {
-		return null;
-	}
-
-	public Route createNewRoute(Route params) {
-		return null;
-	}
-
-	public void deleteRouteById(Long routeId) {
-
-	}
-
-	public Route startRoute(Long id) {
-		return null;
-	}
-
-	public Route finishRoute(Long id) {
-		return null;
 	}
 
 	public List<Route> getAllRoutes(Connection connection, Long numberOfPage, Long elementsInPage) {
@@ -85,5 +69,22 @@ public class RouteRepository {
 				.addParameter("limit", elementsInPage)
 				.addParameter("offset", offset)
 				.executeAndFetch(resultSetHandler);
+	}
+
+	public void add(Connection connection, Route route) {
+		Long id = connection.createQuery(ADD_NEW_ROUTE)
+				.addParameter("transportId", route.getTransportId())
+				.addParameter("routeStatus", RouteStatus.FUTURE_ROUTE.name())
+				.executeUpdate()
+				.getKey(Long.class);
+
+		route.setId(id);
+	}
+
+	public void connectRouteAndClient(Connection connection, Long routeId, Long clientId) {
+		connection.createQuery(CONNECT_ROUTE_AND_CLIENT)
+				.addParameter("clientId",clientId)
+				.addParameter("routeId",routeId)
+				.executeUpdate();
 	}
 }

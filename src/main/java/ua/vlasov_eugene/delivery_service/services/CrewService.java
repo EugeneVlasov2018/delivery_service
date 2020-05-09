@@ -9,10 +9,9 @@ import ua.vlasov_eugene.delivery_service.dtos.CrewDto;
 import ua.vlasov_eugene.delivery_service.entities.Courier;
 import ua.vlasov_eugene.delivery_service.entities.VehicleCrew;
 import ua.vlasov_eugene.delivery_service.enums.CrewStatus;
-import ua.vlasov_eugene.delivery_service.enums.RouteStatus;
 import ua.vlasov_eugene.delivery_service.exceptions.WrongCourierException;
 import ua.vlasov_eugene.delivery_service.exceptions.WrongCrewException;
-import ua.vlasov_eugene.delivery_service.exceptions.WrongStatusException;
+import ua.vlasov_eugene.delivery_service.exceptions.WrongParameterException;
 import ua.vlasov_eugene.delivery_service.repositories.CourierRepository;
 import ua.vlasov_eugene.delivery_service.repositories.CrewRepository;
 import ua.vlasov_eugene.delivery_service.repositories.TransportRepository;
@@ -20,7 +19,6 @@ import ua.vlasov_eugene.delivery_service.utils.Page;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -144,13 +142,13 @@ public class CrewService {
 		}
 
 		if (oldVersion.getStatus() == CrewStatus.ON_RIDE) {
-			throw new WrongStatusException(WRONG_STATUS_OF_CREW);
+			throw new WrongParameterException(WRONG_STATUS_OF_CREW);
 		}
 	}
 
 	private void checkCrewStatus(VehicleCrew currentCrew) {
 		if (currentCrew.getStatus() == CrewStatus.ON_RIDE) {
-			throw new WrongStatusException(WRONG_STATUS_OF_CREW);
+			throw new WrongParameterException(WRONG_STATUS_OF_CREW);
 		}
 	}
 

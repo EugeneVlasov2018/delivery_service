@@ -10,7 +10,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-	@ExceptionHandler(value = {WrongStatusException.class,
+	@ExceptionHandler(value = {WrongParameterException.class,
 			WrongCourierException.class, WrongCrewException.class})
 	public ResponseEntity<ErrorMessage> handleException(RuntimeException ex) {
 		return new ResponseEntity<>(new ErrorMessage(ex.getMessage()), HttpStatus.BAD_REQUEST);

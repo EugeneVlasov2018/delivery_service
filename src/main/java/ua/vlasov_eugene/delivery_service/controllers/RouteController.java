@@ -9,6 +9,8 @@ import ua.vlasov_eugene.delivery_service.entities.Route;
 import ua.vlasov_eugene.delivery_service.services.RouteService;
 import ua.vlasov_eugene.delivery_service.utils.Page;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/route")
@@ -30,8 +32,10 @@ public class RouteController {
 
 	@ApiOperation("Эндпоинт для создания нового маршрута")
 	@PostMapping
-	public RouteDto createNewRoute(@RequestBody RouteDto params){
-		return routeService.createNewRoute(params);
+	public RouteDto createNewRoute(@RequestParam Long transportId,
+								   @RequestParam Long crewId,
+								   @RequestParam List<Long> clientId){
+		return routeService.createNewRoute(transportId, crewId, clientId);
 	}
 
 	@ApiOperation("Эндпоинт для запуска маршрута по id")

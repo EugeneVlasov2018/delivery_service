@@ -16,7 +16,7 @@
 mvn flyway:clean - очистит БД от старых таблиц и данных
 mvn flyway:migrate - создаст таблицы, накатит тестовые данные
 mvn clean install
-mvn spring-boot:runpring.config.location="classpath:application.properties,file:helm/conf/application-dev.properties"
+mvn spring-boot:run
 ```
 
 ВАЖНО!!! Даты в БД хранятся в таймзоне сервера, но возвращаются в UTC, чтобы на фронте біло удобнее подгонять ответ под таймзону клиента

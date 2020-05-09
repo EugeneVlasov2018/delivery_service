@@ -17,7 +17,9 @@ import java.util.List;
 public class RouteController {
 	private final RouteService routeService;
 
-	@ApiOperation("Возвращает все маршруты согласно входящих параметров.")
+	@ApiOperation("Возвращает все маршруты согласно входящих параметров.\n" +
+			"ВАЖНО!!! Даты на сервере хранятся в таймзоне сервера, но возвращаются в UTC,\n" +
+			"чтобі на фронте біло удобнее подгонять ответ под таймзону клиента")
 	@GetMapping
 	public Page<RouteDto> getAllRoutes(@RequestParam(defaultValue = "1") Long numberOfPage,
 									   @RequestParam(defaultValue = "10") Long elementsInPage){

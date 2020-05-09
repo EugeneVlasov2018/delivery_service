@@ -5,12 +5,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.sql2o.Connection;
 import org.sql2o.Sql2o;
+import ua.vlasov_eugene.delivery_service.custom_validator.EntityValidator;
 import ua.vlasov_eugene.delivery_service.dtos.CrewDto;
 import ua.vlasov_eugene.delivery_service.entities.Courier;
 import ua.vlasov_eugene.delivery_service.entities.VehicleCrew;
 import ua.vlasov_eugene.delivery_service.enums.CrewStatus;
-import ua.vlasov_eugene.delivery_service.exceptions.WrongCourierException;
-import ua.vlasov_eugene.delivery_service.exceptions.WrongCrewException;
 import ua.vlasov_eugene.delivery_service.exceptions.WrongParameterException;
 import ua.vlasov_eugene.delivery_service.repositories.CourierRepository;
 import ua.vlasov_eugene.delivery_service.repositories.CrewRepository;
@@ -24,22 +23,21 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CrewService {
-	private static final String WRONG_STATUS_OF_CREW = "Вы не можете менять экипаж, находящийся в поездке";
 	private static final String COURIER_IS_BUSY = "Вы не можете добавить в экипаж курьера, уже находящегося в другом экипаже";
 	private static final String SUCCESSFULLY_DELETE = "Данные о экипаже были успешно удалены";
-	private static final String COURIER_NOT_VALID = "Курьер без ID - не валиден";
 	private static final String CREW_NOT_EXIST = "Экипажа с таким ID не существует";
 	private final CrewRepository crewRepo;
 	private final CourierRepository courierRepo;
 	private final TransportRepository transportRepo;
 	private final Sql2o sql2o;
+	private final EntityValidator validator;
 
 	@Transactional
 	public Page<CrewDto> getCrewByFilter(Long numberOfPage, Long elementsInPage) {
 		Page<CrewDto> result;
-		try(Connection connection = sql2o.beginTransaction()) {
-			List<VehicleCrew> crews =  crewRepo.getAllCrews(connection,
-					numberOfPage-1, elementsInPage);
+		try (Connection connection = sql2o.beginTransaction()) {
+			List<VehicleCrew> crews = crewRepo.getAllCrews(connection,
+					numberOfPage - 1, elementsInPage);
 			result = createPageFromCrews(connection, crews);
 			connection.commit();
 		}
@@ -61,17 +59,17 @@ public class CrewService {
 	@Transactional
 	public CrewDto updateCrew(CrewDto newVersionOfCrew) {
 		CrewDto result = new CrewDto();
-		try(Connection connection = sql2o.beginTransaction()){
-			VehicleCrew oldCrew = crewRepo.getCrewById(connection,newVersionOfCrew.getId());
+		try(Connection connection = sql2o.beginTransaction()) {
+			VehicleCrew oldCrew = crewRepo.getCrewById(connection, newVersionOfCrew.getId());
 
-			checkCrewStatus(oldCrew,newVersionOfCrew.getStatus());
+			validator.checkCrewStatus(oldCrew, newVersionOfCrew.getStatus(), CrewStatus.ON_RIDE);
 			checkAllCouriersFromNewVersion(connection,
 					newVersionOfCrew.getCouriers(),
 					oldCrew.getId());
 
-			courierRepo.disconnectAllOldCouriers(connection,newVersionOfCrew.getId());
-			addNewCouriersToCrew(connection,newVersionOfCrew.getId(),newVersionOfCrew.getCouriers());
-			crewRepo.updateCrewStatus(connection,newVersionOfCrew);
+			courierRepo.disconnectAllOldCouriers(connection, newVersionOfCrew.getId());
+			addNewCouriersToCrew(connection, newVersionOfCrew.getId(), newVersionOfCrew.getCouriers());
+			crewRepo.updateCrewStatus(connection, newVersionOfCrew);
 
 			//TODO этот блок, в принципе, не обязателен (если производительность критична, -
 			// можно убивать, просто вернув newVersionOfCrew),
@@ -89,15 +87,15 @@ public class CrewService {
 
 	@Transactional
 	public String deleteById(Long id) {
-		try(Connection connection = sql2o.beginTransaction()){
-			VehicleCrew currentCrew = crewRepo.getCrewById(connection,id);
+		try(Connection connection = sql2o.beginTransaction()) {
+			VehicleCrew currentCrew = crewRepo.getCrewById(connection, id);
 			checkCrewOnNullable(currentCrew);
 
-			checkCrewStatus(currentCrew);
+			validator.checkCrewStatus(currentCrew);
 
-			courierRepo.disconnectAllOldCouriers(connection,id);
-			transportRepo.disconnectTransportOfCrew(connection,id);
-			crewRepo.deleteCrewById(connection,id);
+			courierRepo.disconnectAllOldCouriers(connection, id);
+			transportRepo.disconnectTransportOfCrew(connection, id);
+			crewRepo.deleteCrewById(connection, id);
 
 			connection.commit();
 		}
@@ -109,47 +107,23 @@ public class CrewService {
 	@Transactional
 	public CrewDto createNewCrew(CrewDto request) {
 		CrewDto result = new CrewDto();
-		try(Connection connection = sql2o.beginTransaction()){
+		try(Connection connection = sql2o.beginTransaction()) {
 			List<Courier> couriers = request.getCouriers();
-			checkCouriersIsExist(couriers);
+			validator.checkCouriersIsExist(couriers);
 
 			//TODO Можно сделать валидатор на проверку соответствия
 			// курьеров из запроса и курьеров с теми же ИД из БД +
 			// проверить, нету ли этих курьеров в других экипажах но потом
 
 			VehicleCrew newCrew = new VehicleCrew().setStatus(CrewStatus.READY_FOR_RIDE).setId(null);
-			crewRepo.addNewCrew(connection,newCrew);
-			addNewCouriersToCrew(connection,newCrew.getId(),couriers);
+			crewRepo.addNewCrew(connection, newCrew);
+			addNewCouriersToCrew(connection, newCrew.getId(), couriers);
 
 			result.setId(newCrew.getId()).setStatus(newCrew.getStatus()).setCouriers(couriers);
 			connection.commit();
 		}
 
 		return result;
-	}
-
-	private void checkCouriersIsExist(List<Courier> couriers) {
-		for(Courier courier: couriers){
-			if(courier.getId()==null||courier.getId()==0L){
-				throw new WrongCourierException(COURIER_NOT_VALID);
-			}
-		}
-	}
-
-	private void checkCrewStatus(VehicleCrew oldVersion, CrewStatus status) {
-		if(oldVersion.getStatus()==status) {
-			return;
-		}
-
-		if (oldVersion.getStatus() == CrewStatus.ON_RIDE) {
-			throw new WrongParameterException(WRONG_STATUS_OF_CREW);
-		}
-	}
-
-	private void checkCrewStatus(VehicleCrew currentCrew) {
-		if (currentCrew.getStatus() == CrewStatus.ON_RIDE) {
-			throw new WrongParameterException(WRONG_STATUS_OF_CREW);
-		}
 	}
 
 	private Page<CrewDto> createPageFromCrews(Connection connection, List<VehicleCrew> crews) {
@@ -187,14 +161,14 @@ public class CrewService {
 				.map(Courier::getId)
 				.allMatch(id -> courierRepo.checkCouriersStatus(connection,id,crewId));
 
-		if(!allCouriersCanRide){
-			throw new WrongCourierException(COURIER_IS_BUSY);
+		if(!allCouriersCanRide) {
+			throw new WrongParameterException(COURIER_IS_BUSY);
 		}
 	}
 
 	private void checkCrewOnNullable(VehicleCrew currentCrew) {
-		if(currentCrew==null){
-			throw new WrongCrewException(CREW_NOT_EXIST);
+		if(currentCrew==null) {
+			throw new WrongParameterException(CREW_NOT_EXIST);
 		}
 	}
 }

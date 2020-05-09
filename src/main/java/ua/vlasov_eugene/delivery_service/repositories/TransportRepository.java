@@ -9,6 +9,8 @@ import ua.vlasov_eugene.delivery_service.enums.TransportStatus;
 @Repository
 public class TransportRepository {
 	private static final String DISCONNECT_TRANSPORT_OF_CREW = "UPDATE transport SET crew_id = NULL WHERE crew_id=:crewId";
+	private static final String GET_TRANSPORT_BY_ID = "SELECT * FROM transport WHERE id=:id LIMIT 1";
+	private static final String CHANGE_STATUS = "UPDATE transport SET transport_status =:status WHERE id =îd";
 	private ResultSetHandler<Transport> resultSetHandler = rs -> {
 		Transport item = new Transport();
 		item.setId(rs.getLong("id"));
@@ -22,6 +24,19 @@ public class TransportRepository {
 	public void disconnectTransportOfCrew(Connection connection, Long id) {
 		connection.createQuery(DISCONNECT_TRANSPORT_OF_CREW)
 				.addParameter("crewId",id)
+				.executeUpdate();
+	}
+
+	public Transport getTransportByRouteId(Connection connection, Long transportId) {
+		return connection.createQuery(GET_TRANSPORT_BY_ID)
+				.addParameter("id",transportId)
+				.executeAndFetchFirst(resultSetHandler);
+	}
+
+	public void changeStatusById(Connection connection, Transport transport) {
+		connection.createQuery(CHANGE_STATUS)
+				.addParameter("status",transport.getStatus().name())
+				.addParameter("id",transport.getId())
 				.executeUpdate();
 	}
 }

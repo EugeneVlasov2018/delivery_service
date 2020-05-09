@@ -18,6 +18,7 @@ public class CrewRepository {
 	private static final String DELETE_CREW = "DELETE FROM vehicle_crew WHERE id = :crewId";
 	private static final String ADD_NEW_CREW = "INSERT INTO vehicle_crew (crew_status) VALUES (:status)";
 
+
 	private ResultSetHandler<VehicleCrew> resultSetHandler = rs -> {
 		VehicleCrew item = new VehicleCrew();
 		item.setId(rs.getLong("id"));
@@ -75,5 +76,12 @@ public class CrewRepository {
 				.getKey(Long.class);
 		
 		newCrew.setId(id);
+	}
+
+	public void changeStatusById(Connection connection, VehicleCrew crew) {
+		connection.createQuery(UPDATE_CREW_STATUS)
+				.addParameter("status",crew.getStatus().name())
+				.addParameter("crewId",crew.getId())
+				.executeUpdate();
 	}
 }

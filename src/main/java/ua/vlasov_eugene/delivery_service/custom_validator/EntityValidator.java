@@ -24,7 +24,8 @@ public class EntityValidator {
 	private static final String CREW_IS_NOT_EXIST = "Экипажа с таким id не существует";
 	private static final String CLIENT_IS_NOT_EXIST = "Клиент из списка отсутствует базе данных";
 
-	public void checkCrewStatus(VehicleCrew crew, CrewStatus successStatus) {
+	//TODO в идеале, лучше все методы перевести в boolean (удобнее тестить, мокая) нона рефакторинг не хватило времени
+	public void crewIsOnRide(VehicleCrew crew, CrewStatus successStatus) {
 		if (crew == null) {
 			throw new WrongParameterException(CREW_IS_NOT_EXIST);
 		}
@@ -51,10 +52,8 @@ public class EntityValidator {
 		}
 	}
 
-	public void checkRouteOfNullable(Route currentRoute) {
-		if (currentRoute == null) {
-			throw new WrongParameterException(ROUTE_NOT_EXIST);
-		}
+	public boolean routeIsExist(Route currentRoute) {
+		return currentRoute != null;
 	}
 
 	public void checkAllClientsOnValid(List<Client> result) {
@@ -85,9 +84,7 @@ public class EntityValidator {
 		}
 	}
 
-	public void checkCrewStatus(VehicleCrew currentCrew) {
-		if (currentCrew.getStatus() == CrewStatus.ON_RIDE) {
-			throw new WrongParameterException(WRONG_STATUS_OF_CREW);
-		}
+	public boolean crewIsOnRide(VehicleCrew currentCrew) {
+		return currentCrew.getStatus() == CrewStatus.ON_RIDE;
 	}
 }

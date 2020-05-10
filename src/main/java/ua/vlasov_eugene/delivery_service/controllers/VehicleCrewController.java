@@ -25,7 +25,7 @@ public class VehicleCrewController {
 
 	@ApiOperation("Создает новый экипаж")
 	@PostMapping(value = "/new")
-	public CrewDto createNewCrew (@RequestBody CrewDto newCrew){
+	public CrewDto createNewCrew(@RequestBody CrewDto newCrew) {
 		return crewService.createNewCrew(newCrew);
 	}
 
@@ -35,16 +35,16 @@ public class VehicleCrewController {
 		return crewService.getCrewById(id);
 	}
 
-	@ApiOperation("Эндпоинт для прикрепления экипажа к ТС, изменения состава экипажа." +
+	@ApiOperation("Эндпоинт для изменения состава экипажа." +
 			"Если экипаж уже в поездке, - будет выброшено исключение")
 	@PutMapping
-	public CrewDto updateCrew(@RequestBody CrewDto oldVersionOfCrew){
+	public CrewDto updateCrew(@RequestBody CrewDto oldVersionOfCrew) {
 		return crewService.updateCrew(oldVersionOfCrew);
 	}
 
 	@ApiOperation("Эндпоинт для удаления экипажа по id\n В случае передачи несуществующего ID будет выброшено исключение")
 	@DeleteMapping(value = "/{id}")
-	public String deleteCrewById(@PathVariable Long id){
+	public String deleteCrewById(@PathVariable Long id) {
 		return crewService.deleteById(id);
 	}
 }

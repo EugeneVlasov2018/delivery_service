@@ -26,6 +26,7 @@ public class CrewService {
 	private static final String COURIER_IS_BUSY = "Вы не можете добавить в экипаж курьера, уже находящегося в другом экипаже";
 	private static final String SUCCESSFULLY_DELETE = "Данные о экипаже были успешно удалены";
 	private static final String CREW_NOT_EXIST = "Экипажа с таким ID не существует";
+	private static final String WRONG_STATUS_OF_CREW = "Вы не можете менять экипаж, находящийся в поездке";
 	private final CrewRepository crewRepo;
 	private final CourierRepository courierRepo;
 	private final TransportRepository transportRepo;
@@ -91,7 +92,9 @@ public class CrewService {
 			VehicleCrew currentCrew = crewRepo.getCrewById(connection, id);
 			checkCrewOnNullable(currentCrew);
 
-			validator.checkCrewStatus(currentCrew);
+			if (validator.crewIsOnRide(currentCrew)) {
+				throw new WrongParameterException(WRONG_STATUS_OF_CREW);
+			}
 
 			courierRepo.disconnectAllOldCouriers(connection, id);
 			transportRepo.disconnectTransportOfCrew(connection, id);

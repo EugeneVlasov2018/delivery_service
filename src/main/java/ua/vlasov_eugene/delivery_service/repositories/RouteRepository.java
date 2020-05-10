@@ -16,13 +16,14 @@ import java.util.TimeZone;
 @Repository
 public class RouteRepository {
 	private static final String GET_ALL_ROUTES = "SELECT * FROM route LIMIT :limit OFFSET :offset";
-	private static final String GET_ROUTE_BY_ID = "SELECT * FROM ROUTE WHERE id=:routeId LIMIT 1";
+	private static final String GET_ROUTE_BY_ID = "SELECT * FROM route WHERE id = :routeId LIMIT 1";
 	private static final String STOP_ROUTE = "UPDATE route " +
 			"SET end_route = :finish , route_status = :status " +
 			"WHERE id=:routeId";
 	private static final String START_ROUTE = "UPDATE route " +
 			"SET start_route = :start , route_status = :status " +
-			"WHERE id=:routeId";;
+			"WHERE id=:routeId";
+	;
 	private static final String ADD_NEW_ROUTE = "INSERT INTO route " +
 			"(transport_id , route_status) " +
 			"VALUES (:transportId , :routeStatus)";

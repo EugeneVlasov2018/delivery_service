@@ -14,6 +14,7 @@ import ua.vlasov_eugene.delivery_service.enums.CrewStatus;
 import ua.vlasov_eugene.delivery_service.enums.RouteStatus;
 import ua.vlasov_eugene.delivery_service.enums.TransportStatus;
 import ua.vlasov_eugene.delivery_service.dtos.RouteDto;
+import ua.vlasov_eugene.delivery_service.exceptions.WrongParameterException;
 import ua.vlasov_eugene.delivery_service.repositories.ClientRepository;
 import ua.vlasov_eugene.delivery_service.repositories.CrewRepository;
 import ua.vlasov_eugene.delivery_service.repositories.RouteRepository;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class RouteService {
+	private static final String ROUTE_NOT_EXIST = "Поездки с таким id не не существует";
 	private final RouteRepository routeRepo;
 	private final ClientRepository clientRepo;
 	private final CrewRepository crewRepo;
@@ -55,7 +57,7 @@ public class RouteService {
 			validator.checkTransportStatus(transport, TransportStatus.FREE);
 
 			VehicleCrew crew = crewRepo.getCrewById(connection, crewId);
-			validator.checkCrewStatus(crew, CrewStatus.READY_FOR_RIDE);
+			validator.crewIsOnRide(crew, CrewStatus.READY_FOR_RIDE);
 
 			List<Client> clients = getValidClientsById(connection, clientId);
 
@@ -78,7 +80,10 @@ public class RouteService {
 		RouteDto result;
 		try(Connection connection = sql2o.beginTransaction()) {
 			Route routeFromDb = routeRepo.getRouteById(connection, routeId);
-			validator.checkRouteOfNullable(routeFromDb);
+
+			if (!validator.routeIsExist(routeFromDb)) {
+				throw new WrongParameterException(ROUTE_NOT_EXIST);
+			}
 
 			result = prepareRouteFromDbForResult(connection, routeFromDb);
 			connection.commit();
@@ -97,7 +102,7 @@ public class RouteService {
 			validator.checkTransportStatus(transport, TransportStatus.FREE);
 
 			VehicleCrew crew = crewRepo.getCrewById(connection, transport.getCrewId());
-			validator.checkCrewStatus(crew, CrewStatus.READY_FOR_RIDE);
+			validator.crewIsOnRide(crew, CrewStatus.READY_FOR_RIDE);
 
 			currentRoute.setStart(new Date());
 			currentRoute.setStatus(RouteStatus.ROUTE_IN_PROCESS);
@@ -129,7 +134,7 @@ public class RouteService {
 			validator.checkTransportStatus(transport, TransportStatus.ON_THE_ROAD);
 
 			VehicleCrew crew = crewRepo.getCrewById(connection, transport.getCrewId());
-			validator.checkCrewStatus(crew, CrewStatus.ON_RIDE);
+			validator.crewIsOnRide(crew, CrewStatus.ON_RIDE);
 
 			currentRoute.setFinish(new Date());
 			currentRoute.setStatus(RouteStatus.ENDED_ROUTE);
@@ -161,15 +166,20 @@ public class RouteService {
 	}
 
 	private RouteDto prepareRouteFromDbForResult(Connection connection, Route routeFromDb) {
-		Transport transport = transportRepo.getTransportById(connection,routeFromDb.getTransportId());
-		List<Client> clients = clientRepo.getClientsByRouteId(connection,routeFromDb.getId());
-		return new RouteDto()
+		RouteDto result = new RouteDto()
 				.setId(routeFromDb.getId())
 				.setStart(routeFromDb.getStart())
 				.setEnd(routeFromDb.getFinish())
 				.setStatus(routeFromDb.getStatus())
-				.setRouteClient(clients)
-				.setTransport(transport);
+				.setRouteClient(clientRepo.getClientsByRouteId(
+						connection, routeFromDb.getId()));
+
+		if (routeFromDb.getTransportId() != null) {
+			result.setTransport(
+					transportRepo.getTransportById(
+							connection, routeFromDb.getTransportId()));
+		}
+		return result;
 	}
 
 	private RouteDto prepareRouteForResult(Route newRoute, Transport transport, List<Client> clients) {

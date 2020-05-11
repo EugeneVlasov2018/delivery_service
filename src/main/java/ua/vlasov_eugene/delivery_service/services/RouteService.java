@@ -74,7 +74,6 @@ public class RouteService {
 		return result;
 	}
 
-
 	@Transactional
 	public RouteDto getRouteById(Long routeId){
 		RouteDto result;
@@ -105,12 +104,14 @@ public class RouteService {
 			validator.crewIsOnRide(crew, CrewStatus.READY_FOR_RIDE);
 
 			currentRoute.setStart(new Date());
-			currentRoute.setStatus(RouteStatus.ROUTE_IN_PROCESS);
-			transport.setStatus(TransportStatus.ON_THE_ROAD);
-			crew.setStatus(CrewStatus.ON_RIDE);
-			routeRepo.startOrStopRoute(connection, currentRoute);
-			transportRepo.changeStatusById(connection, transport);
-			crewRepo.changeStatusById(connection, crew);
+
+			updateAllEntities(connection,
+					currentRoute,
+					transport,
+					crew,
+					RouteStatus.ROUTE_IN_PROCESS,
+					TransportStatus.ON_THE_ROAD,
+					CrewStatus.ON_RIDE);
 
 			result.setId(currentRoute.getId())
 					.setStatus(currentRoute.getStatus())
@@ -122,6 +123,7 @@ public class RouteService {
 		}
 		return result;
 	}
+
 
 	@Transactional
 	public RouteDto finishRoute(Long id) {
@@ -137,13 +139,14 @@ public class RouteService {
 			validator.crewIsOnRide(crew, CrewStatus.ON_RIDE);
 
 			currentRoute.setFinish(new Date());
-			currentRoute.setStatus(RouteStatus.ENDED_ROUTE);
-			transport.setStatus(TransportStatus.FREE);
-			crew.setStatus(CrewStatus.READY_FOR_RIDE);
 
-			routeRepo.startOrStopRoute(connection, currentRoute);
-			transportRepo.changeStatusById(connection, transport);
-			crewRepo.changeStatusById(connection, crew);
+			updateAllEntities(connection,
+					currentRoute,
+					transport,
+					crew,
+					RouteStatus.ENDED_ROUTE,
+					TransportStatus.FREE,
+					CrewStatus.READY_FOR_RIDE);
 
 			result.setId(currentRoute.getId())
 					.setStatus(currentRoute.getStatus())
@@ -206,5 +209,20 @@ public class RouteService {
 		validator.checkAllClientsOnValid(result);
 
 		return result;
+	}
+
+	private void updateAllEntities(Connection connection,
+								   Route route,
+								   Transport transport,
+								   VehicleCrew crew,
+								   RouteStatus resultStatusForRoute,
+								   TransportStatus resultStatusForTransport,
+								   CrewStatus resultStatusForCrew) {
+		route.setStatus(resultStatusForRoute);
+		transport.setStatus(resultStatusForTransport);
+		crew.setStatus(resultStatusForCrew);
+		routeRepo.startOrStopRoute(connection, route);
+		transportRepo.changeStatusById(connection, transport);
+		crewRepo.changeStatusById(connection, crew);
 	}
 }

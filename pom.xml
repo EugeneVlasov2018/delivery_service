@@ -18,9 +18,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.9</java.version>
-        <flyway.user>--установить username--</flyway.user>
-        <flyway.url>--установить url--</flyway.url>
-        <flyway.password>--установить password--</flyway.password>
+        <!--<flyway.user>юзер</flyway.user>
+        <flyway.url>БДurl</flyway.url>
+        <flyway.password>пароль</flyway.password>-->
+        <flyway.user>postgres</flyway.user>
+        <flyway.url>jdbc:postgresql://localhost:5432/delivery_service</flyway.url>
+        <flyway.password>granit1506</flyway.password>
     </properties>
 
     <dependencies>
@@ -79,12 +82,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.junit.vintage</groupId>
-                    <artifactId>junit-vintage-engine</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 

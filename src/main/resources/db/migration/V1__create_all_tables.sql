@@ -53,8 +53,8 @@ create table if not exists route
 	id serial not null
 		constraint route_pk
 			primary key,
-	start_route timestamp,
-	end_route timestamp,
+	start_route timestamptz,
+	end_route timestamptz,
 	transport_id integer
 		constraint route_transport_id_fk
 			references transport,

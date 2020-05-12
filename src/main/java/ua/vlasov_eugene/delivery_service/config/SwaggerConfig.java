@@ -32,8 +32,8 @@ public class SwaggerConfig {
 	private ApiInfo apiInfo() {
 		return new ApiInfoBuilder()
 				.title("Курьерская служба")
-				.description("Тестовое задание для Rationallogistics\n" +
-						"ВАЖНО !!!! Даты на сервере хранятся в таймзоне сервера, но возвращаются в UTC,\n" +
+				.description("Тестовое задание для Rationallogistics\n\n" +
+						"ВАЖНО !!!! Даты на сервере хранятся и возвращаются в UTC,\n" +
 						"чтобы на фронте было удобнее подгонять ответ под таймзону клиента")
 				.contact(new Contact("Eugene Vlasov",null,"negativ529021@gmail.com"))
 				.version("1.0")

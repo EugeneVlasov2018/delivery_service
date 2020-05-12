@@ -52,14 +52,14 @@ public class RouteRepository {
 		if(route.getFinish()!=null){
 			connection.createQuery(STOP_ROUTE)
 					.addParameter("finish",
-							LocalDateTime.ofInstant(route.getFinish().toInstant(), ZoneId.systemDefault()))
+							LocalDateTime.ofInstant(route.getFinish().toInstant(), ZoneId.of("UTC")))
 					.addParameter("status",route.getStatus().name())
 					.addParameter("routeId",route.getId())
 					.executeUpdate();
 		} else {
 			connection.createQuery(START_ROUTE)
 					.addParameter("start",
-							LocalDateTime.ofInstant(route.getStart().toInstant(),ZoneId.systemDefault()))
+							LocalDateTime.ofInstant(route.getStart().toInstant(), ZoneId.of("UTC")))
 					.addParameter("status",route.getStatus().name())
 					.addParameter("routeId",route.getId())
 					.executeUpdate();
